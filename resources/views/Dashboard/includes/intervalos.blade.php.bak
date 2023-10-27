@@ -1,0 +1,23 @@
+<div class="period-intervals main-content">
+  <div class="date-buttons">
+    <button class="previous-period-interval btn-blue">
+      <i class="fas fa-angle-double-left"></i>
+      <!-- <span>Ant.</span> -->
+    </button>
+    <button class="period btn-blue" onclick="openIntervalModal()"> 
+      <div class="period-intervals-modifier">
+        <i class="fas fa-pencil-alt"></i>
+      </div>
+      <span>{{$label_intervalo}}</span>
+    </button>
+
+    <button class="next-period-interval btn-blue">
+      <!-- <span>Sig.</span>  -->
+      <i class="fas fa-angle-double-right"></i>
+    </button>
+  </div>
+  <div class="interval">
+    <i class="fas fa-calendar-alt"></i>
+    <span>{{$date_from}} - {{$date_to}}</span>
+  </div>
+</div>

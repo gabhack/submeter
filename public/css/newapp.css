@@ -1,0 +1,179 @@
+/* Estilos para inicio de sesión, recuperar contraseña y solicitud de registro */
+
+@font-face {
+  font-family: "Univers-45-Light";
+  src: url(../fonts/Univers-45-Light.ttf) format("truetype");
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Univers-45-Light";
+}
+
+.alert {
+  --alert-font-color: #333;
+  --alert-bg-color: #f2f2f2;
+  --alert-border-color: #333;
+  max-width: 25rem;
+  width: 100%;
+  margin: 1em 0 1em 0;
+  padding: 0.4em 1.5em;
+  border: 1px solid var(--alert-border-color);
+  border-radius: 0.4em;
+  text-align: justify;
+  background-color: var(--alert-bg-color);
+  color: var(--alert-font-color);
+}
+
+.alert.alert-danger {
+  --alert-font-color: #a94442;
+  --alert-bg-color: #f2dede;
+  --alert-border-color: #ebccd1;
+}
+
+.alert.alert-success {
+  --alert-font-color: #46a942;
+  --alert-bg-color: #def2e0;
+  --alert-border-color: #1ef00b;
+}
+
+.alert-danger hr {
+  margin: 1em 0;
+  padding: 0;
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #e4b9c0;
+}
+
+.form-error {
+  margin-bottom: 0.8em;
+  color: #a94442;
+}
+
+.form-error::before {
+  content: "*";
+}
+
+.login {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: url(../images/Fondo_Submeter.jpg) center center no-repeat fixed;
+  background-size: cover;
+  background-color: #464646;
+  color: #fff;
+}
+
+.login .login-panel {
+  min-width: 280px;
+  width: 90%;
+  max-width: 40ch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.2em 1em;
+  padding-bottom: 0;
+  border-radius: 0.4em;
+  color: #000;
+  background-color: #f2f2f2;
+}
+
+.login .login-panel .logo {
+  max-width: 13rem;
+  align-self: flex-end;
+}
+
+.login .login-panel .section-title {
+  color: #004165;
+  align-self: flex-start;
+  text-decoration: underline;
+}
+
+.login .login-panel .copyrigth {
+  font-size: 0.7rem;
+  color: #333;
+  white-space: nowrap;
+}
+
+.login .login-panel .alert-danger {
+  margin-top: 0.3em;
+}
+
+.login .login-panel #myForm {
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.login .login-panel .styled-link {
+  align-self: flex-start;
+  font-weight: 700;
+  color: #333;
+  margin: 1em 0;
+  font-size: 0.9rem;
+}
+
+.login .login-panel .styled-link:visited {
+  color: #333;
+}
+
+.login .login-panel .styled-link:focus,
+.login .login-panel .styled-link:hover {
+  color: #1f87c0;
+}
+
+.label {
+  margin-top: 0.6em;
+  color: #004165;
+  font-weight: bolder;
+}
+
+.login .login-panel .btn {
+  cursor: pointer;
+  padding: 0.6em 0.3em;
+  background-color: #004165;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+}
+
+.login .login-panel .input {
+  padding: 0.4em 0.3em;
+  border: 1px solid #333;
+}
+
+.login .login-panel .input,
+.login .login-panel .btn {
+  align-self: stretch;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  border-radius: 0.3em;
+  outline-style: none;
+  transition: background-color 0.2s ease-out;
+  transition: box-shadow 0.2s ease-out;
+}
+
+.login .login-panel .input:focus,
+.login .login-panel .input:hover {
+  border-color: #004165;
+  box-shadow: 0 0 1.5pt 1.2pt #004165;
+}
+
+.login .login-panel .btn:focus,
+.login .login-panel .btn:hover {
+  background-color: #02314b;
+  box-shadow: 0 0 1.5pt 1.2pt #02314b;
+}
+
+.login span {
+  margin-top: 0.6em;
+  margin-bottom: 0.6em;
+  font-size: 0.9rem;
+}

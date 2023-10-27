@@ -1,0 +1,537 @@
+<div class="modal fade" tabindex="-1" role="dialog" id="modalAnalyzer">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            	<h5 class="modal-title">Analizadores</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<div class="row" id="analyzerListContainer">
+            		<div class="col-12 text-right mb-3">
+            			<button class="btn btn-primary btn-sm" id="btnAddAnalyzer"><span class="fa fa-plus"></span> Añadir Analizador</button>
+            		</div>
+            		<div class="col-12">
+            			<table class="table table-striped table-responsive bg-white mt-3" id="dtAnalyzer">
+                          <thead class="bg-submeter-4">
+                            <tr>
+                              <th class="text-white" scope="col">ID</th>
+                              <th class="text-white" scope="col" width="35%">Contador</th>
+                              <th class="text-white" scope="col" width="90%">Label</th>
+                              <th class="text-white" scope="col">Principal</th>
+                              <th class="text-white" scope="col">Asignar</th>
+                              <th class="text-white" scope="col">Editar</th>
+                              <th class="text-white" scope="col">Eliminar</th>
+                            </tr>
+                          </thead>
+                          <tbody></tbody>
+                        </table>
+            		</div>
+            	</div>
+            	<div class="row" id="analyzerFormContainer">
+            		<div class="col-12">
+            			<form id="analyzerForm" action="" method="post" enctype="multipart/form-data">
+            				{!! csrf_field() !!}
+            				<div id="form_data">
+            				</div>
+                			<div class="row">
+                				<div class="col-12">
+                    				<div class="form-group">
+                        				<label for="name">Nombre</label>
+                                        <input type="text" class="form-control" id="analyzerName" name="name">
+                                        <div class="invalid-feedback"></div>
+                        			</div>
+                    			</div>                    			
+                    			<div class="col-12 col-lg-6">
+                        			<div class="form-group">
+                        				<label for="host">Host</label>
+                                        <input type="text" class="form-control" id="analyzerHost" name="host">
+                                        <div class="invalid-feedback"></div>
+                        			</div>
+                    			</div>
+                    			<div class="col-12 col-lg-6">
+                        			<div class="form-group">
+                        				<label for="database">Database</label>
+                                        <input type="text" class="form-control" id="analyzerDatabase" name="database">
+                                        <div class="invalid-feedback"></div>
+                    				</div>
+                    			</div>
+                    			<div class="col-12 col-lg-6">
+                    				<div class="form-group">
+                        				<label for="user">User</label>
+                                        <input type="text" class="form-control" id="analyzerUser" name="username">
+                                        <div class="invalid-feedback"></div>
+                        			</div>
+                    			</div>
+                    			<div class="col-12 col-lg-6">
+                    				<div class="form-group">
+                        				<label for="port">Password</label>
+                                        <input type="text" class="form-control" id="analyzerPassword" name="password">
+                                        <div class="invalid-feedback"></div>
+                        			</div>
+                    			</div>
+                    			<div class="col-6 col-md-4 col-lg-3">
+                    				<div class="form-group">
+                        				<label for="port">Port</label>
+                                        <input type="number" class="form-control" id="analyzerPort" name="port">
+                                        <div class="invalid-feedback"></div>
+                        			</div>
+                    			</div>
+                    			<div class="col-6 col-md-4 col-lg-3">
+                    				<div class="form-group">
+                        				<label for="color">Color</label>
+                        				<button type="button" id="btnCpAnalyzer" class="input-group-text colorpicker-input-addon">
+                                        	<i class="btn btn-lg colorpicker-height-fix"></i>
+                                        </button>
+                        				<div id="cpAnalyzer" data-color="#000000" style="line-height:0px;">
+                        					<input type="text" name="color" style="width:0px; border:0px; height:0px;" />
+                						</div>
+                					</div>
+                    			</div>
+                    			<div class="col-6 col-md-4 col-lg-3">
+                    				<div class="form-check">
+                    					<input type="checkbox" class="form-check-input" id="main" name="main" value="1">
+                        				<label for="main">Principal</label>
+                					</div>
+                    			</div>
+                			</div>
+                			<hr/>
+                			<div class="row py-3">
+                				<div class="col-6">
+                					<h5>Contadores</h5>
+                				</div>
+                				<div class="col-6 text-right">
+                					<button type="button" class="btn btn-success" id="btnAddAnalyzerMeter"><span class="fa fa-plus"></span> Agregar Contador</button>
+                				</div>
+                			</div>
+                			<div class="row" id="cntAddMeter">
+                				
+                			</div>
+            			</form>
+            		</div>
+            	</div>
+            	<div class="row" id="analyzerDeleteContainer">
+            		<div class="col-12 text-center">
+            			<form id="deleteAnalyzerForm" action="" method="post" enctype="multipart/form-data">
+            				{!! csrf_field() !!}
+            				<input type="hidden" name="_method" value="DELETE" />
+							<input type="hidden" name="id" value="" />
+            			</form>
+            			<p>¿Está seguro que desea eliminar el analizador <strong class="analyzer-name"></strong>?</p>
+        			</div>        		
+            	</div>
+            </div>
+            <div class="modal-footer">
+            	<div id="btnAnalyzerList">
+                	<button type="button" class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-times"></span> Cerrar</button>
+                </div>
+                <div id="btnAnalyzerSave">
+                	<button type="button" class="btn btn-danger btn-analyzer-list"><span class="fa fa-times"></span> Cancelar</button>
+                	<button type="button" class="btn btn-primary" id="btnSaveAnalyzer"><span class="fa fa-save"></span> Guardar</button>
+                	<button type="button" class="btn btn-success" id="btnSaveAssignAnalyzer"><span class="fa fa-check"></span> Guardar y Asignar</button>
+                </div>
+                <div id="btnAnalyzerDelete">
+                	<button type="button" class="btn btn-primary btn-analyzer-list"><span class="fa fa-times"></span> Cancelar</button>
+                	<button type="button" class="btn btn-danger" id="btnConfirmDeleteAnalyzer"><span class="fa fa-trash"></span> Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<template id="analyzerEditFields">
+	<input type="hidden" name="_method" value="PATCH" />
+	<input type="hidden" name="id" value="" />
+</template>
+<template id="analyzerAssignButton">
+	<button class="btn btn-success btn-sm btn-assign-analyzer" data-id="###"><span class="fa fa-check"></span></button>
+</template>
+<template id="analyzerEditButton">
+	<button class="btn btn-primary btn-sm btn-edit-analyzer" data-id="###"><span class="fa fa-pen-fancy"></span></button>
+</template>
+<template id="analyzerDeleteButton">
+	<button class="btn btn-danger btn-sm btn-delete-analyzer" data-id="###"><span class="fa fa-times"></span></button>
+</template>
+<template id="tplSelectMeter">
+	<div class="col-6 cnt-meter-analyzer">
+		<div class="row">
+			<div class="col-9">
+				<div class="form-group">
+					<select class="form-control select-meter" name="analyzerMeter[]">
+					</select>
+				</div>
+			</div>
+			<div class="col-3">
+				<button type="button" class="btn btn-danger btn-delete-meter-analyzer"><span class="fa fa-times"></span></button>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script type="text/javascript">
+<!--
+var tokenAnalyzer = "{{csrf_token()}}";
+var urlListAnalyzer = "{{ route('analyzer.index') }}";
+var urlShowAnalyzer = "{{ route('analyzer.show', ['id' => '?']) }}";
+var urlSaveAnalyzer = "{{ route('analyzer.save') }}";
+var urlUpdateAnalyzer = "{{ route('analyzer.update', ['id' => '?']) }}";
+var urlDeleteAnalyzer = "{{ route('analyzer.delete', ['id' => '?']) }}";
+var urlCombo = "{{ route('energymeter.indexcombo') }}";
+
+var initializeAnalyzer = function() {
+	$("#cntAddMeter").html("");
+	loadComboEnergyMeter();
+	$("#btnAnalyzerList").show();
+	$("#btnAnalyzerSave").hide();
+	$("#btnAnalyzerDelete").hide();
+	$("#analyzerListContainer").show();
+	$("#analyzerDeleteContainer").hide();
+	$("#analyzerFormContainer").hide();
+	$("#modalAnalyzer").modal('show');
+}
+
+var resetAnalyzer = function() {
+	$("#cntAddMeter").html("");
+	loadComboEnergyMeter();
+	$("#btnAnalyzerList").show();
+	$("#btnAnalyzerSave").hide();
+	$("#btnAnalyzerDelete").hide();
+	$("#analyzerListContainer").show();
+	$("#analyzerDeleteContainer").hide();
+	$("#analyzerFormContainer").hide();
+	$("#modalAnalyzer").modal('show');	
+	$("#dtAnalyzer").DataTable().draw();
+}
+
+var loadComboEnergyMeter = function() {
+	var tpl = $("#tplSelectMeter").html();
+	tpl = $(tpl);
+	tpl.find("select").html("");
+	$.ajax({
+ 		type: "GET",
+ 		url: urlCombo,
+	    dataType: "json",
+        success: function (data) {
+            if(data.error) {
+				return false;
+            }
+            for(var i = 0; i < data.data.length; i++){
+				var option = $("<option>");
+				option.html(data.data[i].count_label);
+				option.val(data.data[i].id);
+				tpl.find("select").append(option);
+            }
+            $("#tplSelectMeter").html(tpl[0].outerHTML);
+        },
+        error: function (data) {
+            console.log(data);
+        }	            
+    });
+}
+
+var newAnalyzer = function() {
+	$("#analyzerForm")[0].reset();
+	$("#btnCpAnalyzer i").css({"backgroundColor": "#000000"});
+	$("#analyzerForm [name='color']").val("#000000");
+	$("#modalAnalyzer").data("action", urlSaveAnalyzer);
+	$("#analyzerForm #form_data").html("");
+	$("#analyzerListContainer").hide();
+	$("#analyzerDeleteContainer").hide();
+	$("#analyzerFormContainer").show();
+	$("#btnAnalyzerSave").show();
+	$("#btnAnalyzerList").hide();	
+	$("#btnAnalyzerDelete").hide();
+}
+
+var editAnalyzerHandler = function(event) {
+	event.preventDefault();
+	var id = $(this).data("id");
+	editAnalyzer(id);
+}
+
+var editAnalyzer = function(id) {	
+	var action = urlShowAnalyzer.replace("?", id);
+	$.ajax({
+ 		type: "GET",
+ 		url: action,
+	    dataType: "json",
+        success: function (data) {
+            if(data.error) {
+				return false;
+            }
+            $("#analyzerForm")[0].reset();
+            $("#analyzerForm #form_data").html($("#analyzerEditFields").html());
+            for(var key in data.data){
+				var valData = data.data[key];
+				$("#analyzerForm [type='hidden'][name='" + key + "']").val(valData);
+				$("#analyzerForm [type='text'][name='" + key + "']").val(valData);
+				$("#analyzerForm [type='number'][name='" + key + "']").val(valData);
+				$("#analyzerForm select[name='" + key + "']").val(valData);
+				$("#analyzerForm [type='checkbox'][name='" + key + "'][value='" + valData + "']").prop("checked", "checked");
+				if(key == "color") {
+					$("#btnCpAnalyzer i").css({"backgroundColor": valData});
+				}			
+            }
+			var meters = data.data["meters"];
+            for(var i = 0; i < meters.length; i++) {
+            	var tpl = $("#tplSelectMeter").html();
+            	tpl = $(tpl);
+            	tpl.find("option[value='" + meters[i].meter_id + "']").prop("selected", "selected"); 
+            	$("#cntAddMeter").append(tpl);           	
+            }
+            $("#cntAddMeter .btn-delete-meter-analyzer").off("click").click(deleteMeterAnalyzer);
+        	$("#modalAnalyzer").data("action", urlUpdateAnalyzer.replace('?', id));        	
+        	$("#analyzerListContainer").hide();
+        	$("#analyzerDeleteContainer").hide();
+        	$("#analyzerFormContainer").show();
+        	$("#btnAnalyzerSave").show();
+        	$("#btnAnalyzerList").hide();	
+        	$("#btnAnalyzerDelete").hide();
+        },
+        error: function (data) {
+            console.log(data);
+        }	            
+    });
+	
+}
+
+var sendFormAnalyzer = function(returnFunction, action){
+	var form = $("#analyzerForm")[0];
+	var formData = new FormData(form);
+	$("#analyzerForm input, #analyzerForm select").removeClass("border-error");
+	$("#analyzerForm .invalid-feedback").html("");
+	$.ajax({
+ 		type: "POST",
+ 		url: action,
+ 		data: formData,
+ 		cache: false,
+	    contentType: false,
+	    processData: false,
+	    dataType: "json",
+        success: function (data) {
+        	if(data.error) {
+            	for(key in data.messages){
+                	var input = $("#analyzerForm [name='" + key + "']");
+                	if(input.length > 0) {
+                    	input.addClass("border-error");
+                		var parent = input.closest(".form-group");
+                		if(parent.length > 0) {
+                			parent.find(".invalid-feedback").html(data.messages[key]).show();
+                		}
+                	}
+            	}
+				return false;
+        	}
+        	returnFunction(data.data);
+        },
+        error: function (data) {
+            console.log(data);
+        }	            
+    });
+}
+
+var returnSaveAnalyzer = function(data){
+	resetAnalyzer();
+};
+
+var returnSaveAssignAnalyzer = function(data){
+	var assignFunction = $("#modalAnalyzer").data("assign");
+	if(assignFunction != undefined) {
+		var row = [data.id, data.meter_count, data.label, 1, 1];
+		assignFunction(row);
+		$("#modalAnalyzer").modal("hide");
+	}
+};
+
+var assignAnalyzer = function(event) {
+	event.preventDefault();
+	var assignFunction = $("#modalAnalyzer").data("assign");
+	if(assignFunction != undefined) {
+		var rowObject = $(this).closest("tr");
+		if(rowObject.length > 0) {
+    		var data = $("#dtAnalyzer").DataTable().row(rowObject[0]).data();
+    		var row = [data[0], '', data[2], 1, 1];
+    		assignFunction(row);
+    		$("#modalAnalyzer").modal("hide");
+		}
+	}
+}
+
+var deleteAnalyzer = function(event) {
+	event.preventDefault();
+	
+	var rowObject = $(this).closest("tr");
+	if(rowObject.length > 0) {
+		var data = $("#dtAnalyzer").DataTable().row(rowObject[0]).data();
+		$("#deleteAnalyzerForm [name='id']").val(data[0]);
+		$("#analyzerDeleteContainer .analyzer-name").html(data[2]);
+		$("#analyzerDeleteContainer").show();
+		$("#analyzerListContainer").hide();
+		$("#analyzerFormContainer").hide();
+		$("#btnAnalyzerSave").hide();
+		$("#btnAnalyzerList").hide();	
+		$("#btnAnalyzerDelete").show();
+	}
+}
+
+var confirmDeleteAnalyzer = function(event) {
+	event.preventDefault();
+	var id = $("#deleteAnalyzerForm [name='id']").val();
+	var form = $("#deleteAnalyzerForm")[0];
+	var formData = new FormData(form);
+	var action = urlDeleteAnalyzer.replace("?", id);
+	$.ajax({
+ 		type: "POST",
+ 		url: action,
+ 		data: formData,
+ 		cache: false,
+	    contentType: false,
+	    processData: false,
+	    dataType: "json",
+        success: function (data) {
+        	if(data.error) {
+            	return false;
+        	}
+        	resetAnalyzer();
+        },
+        error: function (data) {
+            console.log(data);
+        }	            
+    });
+}
+
+var initListAnalyzer = function() {
+	$("#dtAnalyzer").DataTable({
+		"processing": true,
+        "serverSide": true,
+        "ajax": urlListAnalyzer,
+        "autoWidth": false,
+		"language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        },
+        "columnDefs": [
+            {
+                "targets": [ 0, 1 ],
+                "visible": false,
+                "searchable": false
+            },
+            {
+                "targets": [ 4, 5, 6 ],
+                "visible": true,
+                "searchable": false,
+                "sortable": false
+            },
+            {
+                "targets": [ 4 ],                
+                "render": function ( data, type, row ) {
+                    var assignedData = $("#modalAnalyzer").data("assigned");
+                    if(assignedData != undefined) {
+                        if(Array.isArray(assignedData)){
+							if(assignedData.indexOf(row[0]) >= 0){
+								return '';
+							}
+                        }                    	
+                    }
+                    var html = $("#analyzerAssignButton").html();
+                    html = html.replace("###", row[0]);
+                    return html;
+                }
+            },
+            {
+                "targets": [ 5 ],                
+                "render": function ( data, type, row ) {
+                    var html = $("#analyzerEditButton").html();
+                    html = html.replace("###", row[0]);
+                    return html;
+                }
+            },
+            {
+                "targets": [ 6 ],                
+                "render": function ( data, type, row ) {
+                    var html = $("#analyzerDeleteButton").html();
+                    html = html.replace("###", row[0]);
+                    return html;
+                }
+            }
+        ],
+        "drawCallback": function( settings ) {
+            $(".btn-edit-analyzer").off("click").click(editAnalyzerHandler);
+            $(".btn-assign-analyzer").off("click").click(assignAnalyzer);
+            $(".btn-delete-analyzer").off("click").click(deleteAnalyzer);
+        }
+	});
+}
+
+var addCounterAnalyzer = function(event) {
+	event.preventDefault();
+	var html = $("#tplSelectMeter").html();
+	$("#cntAddMeter").append(html);
+	$(".btn-delete-meter-analyzer").off("click").click(deleteMeterAnalyzer);
+}
+
+var deleteMeterAnalyzer = function(event) {
+	event.preventDefault();
+	var parent = $(this).closest(".cnt-meter-analyzer");
+	parent.remove();
+}
+
+$(document).ready(function(){
+	$("#modalAnalyzer").data("initialize", initializeAnalyzer);
+	$("#modalAnalyzer").data("reset", resetAnalyzer);
+	$("#modalAnalyzer").data("new", newAnalyzer);
+	$("#modalAnalyzer").data("edit", editAnalyzer);
+	$(".btn-analyzer-list").click(initializeAnalyzer);	
+	
+	$("#btnAddAnalyzer").click(function(){
+		var newForm = $("#modalAnalyzer").data("new");
+		if(newForm != undefined) {
+			newForm();
+		}
+	});
+
+	$(".edit-analyzer").click(function(){
+		var editForm = $("#modalAnalyzer").data("edit");
+		if(editForm != undefined) {
+			editForm();
+		}
+	});
+
+	$("#btnSaveAnalyzer").click(function(event) {
+		event.preventDefault();
+		var action = $("#modalAnalyzer").data("action");
+		sendFormAnalyzer(returnSaveAnalyzer, action);
+	});
+
+	$("#btnAddAnalyzerMeter").click(addCounterAnalyzer);
+
+	$("#btnSaveAssignAnalyzer").click(function(event) {
+		event.preventDefault();
+		var action = $("#modalAnalyzer").data("action");
+		sendFormAnalyzer(returnSaveAssignAnalyzer, action);
+	});
+
+	$("#btnCpAnalyzer").click(function(event){
+		event.preventDefault();
+		var cpObject = $('#cpAnalyzer').data("cpObject");
+		cpObject.show();
+	});
+
+	$("#modalAnalyzer").on("shown.bs.modal", function(){
+		$("#dtAnalyzer").removeAttr("style");
+		$("#dtAnalyzer").DataTable().columns.adjust();
+	});
+
+	$("#btnConfirmDeleteAnalyzer").click(confirmDeleteAnalyzer);
+
+	initListAnalyzer();
+
+	var cpObject = new $.colorpicker($('#cpAnalyzer'), {format:'hex'});
+	$('#cpAnalyzer').data("cpObject",cpObject);
+
+	$('#cpAnalyzer').on('colorpickerChange colorpickerCreate', function (event) {
+		$("#btnCpAnalyzer i").css({"backgroundColor": event.color.string()});
+	});
+});
+
+//-->
+</script>

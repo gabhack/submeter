@@ -1,0 +1,6 @@
+#dataTable_wrapper input[type="search"]{
+    box-shadow: none;
+    outline: none;
+    border-radius: 0px;
+    font-family: 'Univers-45-Light';
+}
