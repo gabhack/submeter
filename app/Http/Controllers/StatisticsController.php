@@ -13,9 +13,11 @@ use Validator;
 use Auth;
 use Session;
 use Exception;
+use Log;
 
 use App\EnterpriseUser;
 use App\StatisticConfiguration;
+use App\StatisticConfigurationsRepresentation;
 
 class StatisticsController extends Controller
 {
@@ -105,109 +107,137 @@ class StatisticsController extends Controller
 
     public function resume(Request $request, $type = '', $user_id = 0)
     {
-        $session_user_id = Auth::user()->id;
+        try {
+            $session_user_id = Auth::user()->id;
 
-        if ($type == '' || !in_array($type, ['produccion', 'indicadores', 'representacion'])) {
-            $path_redirect = "/resumen_energia_potencia/" . $session_user_id;
-            return redirect($path_redirect);
-        }
-
-        if ($user_id != $session_user_id) {
-            $current_url = url()->current();
-            $urlType = "produccion";
-
-            if (strpos($current_url, "indicadores") !== false) {
-                $urlType = "indicadores";
-            } elseif (strpos($current_url, "representacion") !== false) {
-                $urlType = "representacion";
+            if ($type == '' || !in_array($type, ['produccion', 'indicadores', 'representacion'])) {
+                $path_redirect = "/resumen_energia_potencia/" . $session_user_id;
+                return redirect($path_redirect);
             }
 
-            $path_redirect = '/estadisticas/' . $urlType . '/' . $session_user_id;
+            if ($user_id != $session_user_id) {
+                $current_url = url()->current();
+                $urlType = "produccion";
 
-            return redirect($path_redirect);
-        }
+                if (strpos($current_url, "indicadores") !== false) {
+                    $urlType = "indicadores";
+                } elseif (strpos($current_url, "representacion") !== false) {
+                    $urlType = "representacion";
+                }
 
-        $user = User::find($user_id); // Auth::user();
+                $path_redirect = '/estadisticas/' . $urlType . '/' . $session_user_id;
 
-        $interval = "";
-        $flash_current_count = null;
-        $session = Session::get('_flash');
-
-        if (array_key_exists('intervalos', $session)) {
-            $interval = $session['intervalos'];
-            if (array_key_exists("current_count", $session)) {
-                $flash_current_count = $session['current_count'];
+                return redirect($path_redirect);
             }
-        }
 
-        $dataRequest = [];
-        $dataRequest["user"] = $user;
-        $dataRequest["interval"] = $interval;
-        $dataRequest["flash_current_count"] = $flash_current_count;
+            $user = User::find($user_id);
 
-        $contador = ContadorController::getCurrrentController($dataRequest);
+            $interval = "";
+            $flash_current_count = null;
+            $session = Session::get('_flash');
 
-        $interval = "";
-        $flash_current_count = null;
-        $session = $request->session()->get('_flash');
-        if (array_key_exists('intervalos', $session)) {
-            $interval = $session['intervalos'];
-            if (array_key_exists("current_count", $session)) {
-                $flash_current_count = $session['current_count'];
+            if (array_key_exists('intervalos', $session)) {
+                $interval = $session['intervalos'];
+                if (array_key_exists("current_count", $session)) {
+                    $flash_current_count = $session['current_count'];
+                }
             }
-        }
 
-        $flash = Session::get('_flash');
-        $dataHandler = new ProductionDataHandlerController();
-        if (array_key_exists("date_from_personalice", $flash)) {
-            $date_from = $flash['date_from_personalice'];
-        }
+            $dataRequest = [];
+            $dataRequest["user"] = $user;
+            $dataRequest["interval"] = $interval;
+            $dataRequest["flash_current_count"] = $flash_current_count;
 
-        if (!isset($date_from)) {
-            $dateInfo = $dataHandler->getDatesAnalysis();
-            $date_from = $dateInfo["date_from"];
-            $date_to = $dateInfo["date_to"];
-            $label_intervalo = $dateInfo["date_label"];
-        } else {
+            $contador = ContadorController::getCurrrentController($dataRequest);
+
+            $interval = "";
+            $flash_current_count = null;
+            $session = $request->session()->get('_flash');
+            if (array_key_exists('intervalos', $session)) {
+                $interval = $session['intervalos'];
+                if (array_key_exists("current_count", $session)) {
+                    $flash_current_count = $session['current_count'];
+                }
+            }
+
             $flash = Session::get('_flash');
+            $dataHandler = new ProductionDataHandlerController();
+            if (array_key_exists("date_from_personalice", $flash)) {
+                $date_from = $flash['date_from_personalice'];
+            }
 
-            $date_to = Session::get('_flash')['date_to_personalice'];
-            if (array_key_exists("label_intervalo_navigation", $flash)) {
+            if (!isset($date_from)) {
                 $dateInfo = $dataHandler->getDatesAnalysis();
+                $date_from = $dateInfo["date_from"];
+                $date_to = $dateInfo["date_to"];
                 $label_intervalo = $dateInfo["date_label"];
             } else {
-                $dateInfo = $dataHandler->getDatesAnalysis();
-                $label_intervalo = $dateInfo["date_label"];
+                $flash = Session::get('_flash');
+
+                $date_to = Session::get('_flash')['date_to_personalice'];
+                if (array_key_exists("label_intervalo_navigation", $flash)) {
+                    $dateInfo = $dataHandler->getDatesAnalysis();
+                    $label_intervalo = $dateInfo["date_label"];
+                } else {
+                    $dateInfo = $dataHandler->getDatesAnalysis();
+                    $label_intervalo = $dateInfo["date_label"];
+                }
             }
+
+            if ($type == 'indicadores') {
+                $title = 'Indicadores Energéticos';
+            } elseif ($type == 'representacion') {
+                $title = 'Representación Datos';
+            } else {
+                $title = 'Producción Submetering';
+            }
+
+            $userEnterprice = EnterpriseUser::where("user_id", $user->id)->first();
+            if ($type == 'representacion') {
+                $configs = StatisticConfigurationsRepresentation::where("enterprise_id", $userEnterprice->enterprise_id)
+                    ->where('meter_id', $contador->id)
+                    ->where('users_id', $user->id)
+                    ->orderBy('Order_Orden', 'asc')
+                    ->get();
+            } else {
+                $configs = StatisticConfiguration::where("enterprise_id", $userEnterprice->enterprise_id)
+                    ->where('type', $type)
+                    ->where('meter_id', $contador->id)
+                    ->get();
+            }
+            $configs = $this->sortConfigsByOrderField($configs);
+            return view(
+                'statistics.resume',
+                array(
+                    'user' => $user,
+                    //Auth::user(),
+                    'titulo' => $title,
+                    'label_intervalo' => $label_intervalo,
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'configurations' => $configs,
+                    'contador2' => $contador,
+                    'type' => $type,
+                    'tipo_count' => $contador->tipo,
+                    'template' => `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>`
+                )
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Error en el método resume: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json(['error' => 'Se ha producido un error interno'], 500);
         }
+    }
 
-        if ($type == 'indicadores') {
-            $title = 'Indicadores Energéticos';
-        } elseif ($type == 'representacion') {
-            $title = 'Representación Datos';
-        } else {
-            $title = 'Producción Submetering';
-        }
-
-        $userEnterprice = EnterpriseUser::where("user_id", $user->id)->first();
-        $configs = StatisticConfiguration::where("enterprise_id", $userEnterprice->enterprise_id)->where('type', $type)->where('meter_id', $contador->id)->get();
-
-        return view(
-            'statistics.resume',
-            array(
-                'user' => $user,
-                //Auth::user(),
-                'titulo' => $title,
-                'label_intervalo' => $label_intervalo,
-                'date_from' => $date_from,
-                'date_to' => $date_to,
-                'configurations' => $configs,
-                'contador2' => $contador,
-                'type' => $type,
-                'tipo_count' => $contador->tipo,
-                'template' => `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>`
-            )
-        );
+    public function sortConfigsByOrderField($configs)
+    {
+        return $configs->sortBy(function ($config) {
+            return $config->Order_orden === null ? PHP_INT_MAX : $config->Order_orden;
+        });
     }
 
     public function manual(Request $request, $user_id)

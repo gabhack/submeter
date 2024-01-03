@@ -297,6 +297,7 @@ Route::get('api/statics/configs/{id}', 'StatisticsApiController@get')->middlewar
 Route::put('api/statics/configs/{id}', 'StatisticsApiController@update')->middleware('auth');
 Route::delete('api/statics/configs/{id}', 'StatisticsApiController@delete')->middleware('auth');
 Route::get('api/statics/resume/{id}', 'StatisticsApiController@resume')->middleware('auth');
+Route::put('api/statics/configs/configorder/{id}', 'StatisticsApiController@updateConfigOrder')->middleware('auth');
 
 /*
   Route::get('indicadores', 'IndicatorController@list')->name("indicators.list"); 

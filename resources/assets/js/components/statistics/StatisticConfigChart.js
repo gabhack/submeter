@@ -1,52 +1,50 @@
-import React, { Component, useEffect, useState } from "react"
-import ReactDOM from "react-dom"
-import ClockLoader from "react-spinners/ClockLoader"
-import axios from "axios"
-import { css } from "@emotion/core"
-import { toast, ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
+import React, { Component, useEffect, useState } from "react";
+import ReactDOM from "react-dom";
+import ClockLoader from "react-spinners/ClockLoader";
+import axios from "axios";
+import { css } from "@emotion/core";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import jsPDF from "jspdf"
-import "html2canvas"
-import "jspdf-autotable"
+import jsPDF from "jspdf";
+import "html2canvas";
+import "jspdf-autotable";
 
-import CanvasJSReact from "../includes/libs/canvasjs.react"
-import moment from "moment"
+import CanvasJSReact from "../includes/libs/canvasjs.react";
+import moment from "moment";
 
-import * as FileSaver from "file-saver"
-import * as XLSX from "xlsx"
-import { parseInt } from "lodash"
+import * as FileSaver from "file-saver";
+import * as XLSX from "xlsx";
+import { parseInt } from "lodash";
 
-var CanvasJSChart = CanvasJSReact.CanvasJSChart
+var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const StatisticConfigChart = (props) => {
-  const ref = React.createRef()
+  const ref = React.createRef();
 
-  const [options, setOptions] = useState({})
-  const [totals, setTotals] = useState([])
-  const [details, setDetails] = useState({})
-  const [csv, setCsv] = useState([])
+  const [options, setOptions] = useState({});
+  const [totals, setTotals] = useState([]);
+  const [details, setDetails] = useState({});
+  const [csv, setCsv] = useState([]);
 
-  const [error, setError] = useState("")
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] = useState(true)
-  const [loadingPdf, setLoadingPdf] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [loadingPdf, setLoadingPdf] = useState(false);
 
   async function exportPdf() {
     try {
-      setLoadingPdf(true)
-      //options.exportEnabled =  false
-      //setOptions(options)
+      setLoadingPdf(true);
       const html2CanvasOpts = {
         scrollX: -window.scrollX,
         scrollY: -window.scrollY + 15,
         windowWidth: document.documentElement.offsetWidth,
         windowHeight: document.documentElement.offsetHeight,
-      }
+      };
 
-      const pdf = new jsPDF()
-      pdf.setTextColor("#212B39")
-      pdf.setFontSize(11)
+      const pdf = new jsPDF();
+      pdf.setTextColor("#212B39");
+      pdf.setFontSize(11);
       pdf.text(
         props.type == "produccion"
           ? "Producción submeter"
@@ -56,22 +54,16 @@ const StatisticConfigChart = (props) => {
         null,
         null,
         "center"
-      )
-      pdf.addImage("/images/Logo_WEB_Submeter.png", "PNG", 185, 10, 12, 12)
+      );
+      pdf.addImage("/images/Logo_WEB_Submeter.png", "PNG", 185, 10, 12, 12);
 
       let canvaChart = await html2canvas(
         document.querySelector(`#chart_${props.configId} canvas`),
         html2CanvasOpts
-      )
-      const imgData = canvaChart.toDataURL("image/png")
-      const h = parseInt(options.pdfHeight)
-      pdf.addImage(imgData, "PNG", 7, 25, 197, h)
-
-      /*
-			let canvaTotals = await html2canvas(document.querySelector(`#totals_${props.configId}`),html2CanvasOpts);
-			const imgTotals = canvaTotals.toDataURL('image/png');    
-			pdf.addImage(imgTotals, 'PNG',12, 125,185,40)
-			*/
+      );
+      const imgData = canvaChart.toDataURL("image/png");
+      const h = parseInt(options.pdfHeight);
+      pdf.addImage(imgData, "PNG", 7, 25, 197, h);
 
       pdf.autoTable({
         html: `#totals_${props.configId} table`,
@@ -86,18 +78,7 @@ const StatisticConfigChart = (props) => {
           halign: "center",
           fillColor: "#E5E5E5",
         },
-        /*didParseCell: function (data) {
-					if (data.row.section === 'head' && data.row.index === 0) {
-						if(data.column.index > 0)
-						{
-							if(details.header.fields.length >= data.column.index)
-							{
-								data.cell.styles.fillColor = details.header.fields[data.column.index - 1].color
-							}
-						}
-					}
-				}*/
-      })
+      });
 
       pdf.autoTable({
         html: `#details_${props.configId}`,
@@ -111,130 +92,134 @@ const StatisticConfigChart = (props) => {
             if (data.column.index > 0) {
               if (details.header.fields.length >= data.column.index) {
                 data.cell.styles.fillColor =
-                  details.header.fields[data.column.index - 1].color
+                  details.header.fields[data.column.index - 1].color;
               }
             }
           }
           if (data.row.index >= details.rows.length) {
-            data.cell.styles.fillColor = "#7F7F7F"
-            data.cell.styles.textColor = "#FFF"
+            data.cell.styles.fillColor = "#7F7F7F";
+            data.cell.styles.textColor = "#FFF";
           }
         },
-      })
+      });
 
-      await pdf.save(defaultFileName("pdf"))
+      await pdf.save(defaultFileName("pdf"));
       setTimeout(() => {
-        setLoadingPdf(false)
-      }, 3000)
+        setLoadingPdf(false);
+      }, 3000);
     } catch (error) {
-      setLoadingPdf(false)
-      console.log(error)
+      setLoadingPdf(false);
+      console.log(error);
     }
   }
 
   async function exportExcel() {
-    let objectMaxLength = []
+    let objectMaxLength = [];
     for (let i = 0; i < csv.totals.length; i++) {
-      let keys = Object.keys(csv.totals[i])
+      let keys = Object.keys(csv.totals[i]);
       for (let j = 0; j < keys.length; j++) {
         if (typeof keys[j] == "number") {
-          objectMaxLength[j] = 10
+          objectMaxLength[j] = 10;
         } else {
           objectMaxLength[j] =
             objectMaxLength[j] >= keys[j].length
               ? objectMaxLength[j]
-              : keys[j].length
+              : keys[j].length;
         }
       }
 
-      let value = Object.values(csv.totals[i])
+      let value = Object.values(csv.totals[i]);
       for (let j = 0; j < value.length; j++) {
         if (typeof value[j] == "number") {
-          objectMaxLength[j] = 10
+          objectMaxLength[j] = 10;
         } else {
           objectMaxLength[j] =
             objectMaxLength[j] >= value[j].length
               ? objectMaxLength[j]
-              : value[j].length
+              : value[j].length;
         }
       }
     }
-    const wscols = []
+    const wscols = [];
     for (let i = 0; i < objectMaxLength.length; i++) {
       wscols.push({
         width: objectMaxLength[i],
-      })
+      });
     }
-    console.log(wscols)
+    console.log(wscols);
     const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
     const ws = XLSX.utils.json_to_sheet(csv.totals, {
       origin: "A2",
       skipHeader: true,
-    })
+    });
     XLSX.utils.sheet_add_json(ws, csv.details, {
       origin: "A8",
-    })
+    });
     //const ws = XLSX.utils.table_to_sheet;
-    ws["!cols"] = wscols
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] }
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
-    const data = new Blob([excelBuffer], { type: fileType })
+    ws["!cols"] = wscols;
+    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: fileType });
 
-    FileSaver.saveAs(data, defaultFileName("csv"))
+    FileSaver.saveAs(data, defaultFileName("csv"));
   }
 
   async function fetchData(row) {
     try {
-      setLoading(true)
-      const res = await axios.get(`/api/statics/resume/${props.configId}`, {})
+      setLoading(true);
+      const res = await axios.get(
+        `/api/statics/resume/${props.configId}?type=${props.type}`,
+        {}
+      );
+      res.data.data.chart.exportFileName = defaultFileName("");
+      setOptions(res.data.data.chart);
+      setTotals(res.data.data.totals);
+      setDetails(res.data.data.details);
+      setCsv(res.data.data.csv);
 
-      res.data.data.chart.exportFileName = defaultFileName("")
-      setOptions(res.data.data.chart)
-      setTotals(res.data.data.totals)
-      setDetails(res.data.data.details)
-      setCsv(res.data.data.csv)
-
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
 
-      setOptions({})
-      setTotals([])
-      setDetails({})
-      setCsv([])
+      setOptions({});
+      setTotals([]);
+      setDetails({});
+      setCsv([]);
       setError(
         "Ha ocurrido un error y no se pudieron cargar los datos de la configuración." +
           error
-      )
+      );
     }
   }
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   function defaultFileName(ext) {
-    let fname = ""
-    if (props.type == "indicadores") fname = "Indicadores-"
-    else fname = "Produccion Submetering-"
-    fname += props.counter + "-"
-    fname += "(" + moment().format("DD-MM-YYYY") + ")"
-    if (ext) fname += "." + ext
-    return fname
+    let fname = "";
+    if (props.type == "indicadores") fname = "Indicadores-";
+    else if (props.type == "representacion") fname = "Representación Datos-";
+    else fname = "Produccion Submetering-";
+    fname += props.counter + "-";
+    fname += "(" + moment().format("DD-MM-YYYY") + ")";
+    if (ext) fname += "." + ext;
+    return fname;
   }
 
   return (
     <div className="mb-4 mt-3">
       <div className="card mb-3 my-4">
-        <div className="card-body pt-3 pb-1 row ">
+        <div className="card-body pt-3 pb-1 row">
           <h4 className="card-title col-8" style={{ fontWeight: "bold" }}>
             <i className="fa fa-chart-bar" style={{ marginRight: "8px" }}></i>
             {props.configName}
           </h4>
+
           <div className="col-4 text-right">
             <a
-              className="btn btn-sm btn-outline-default "
+              className="btn btn-sm btn-outline-default"
               href={`/estadisticas/configuracion/${props.type}/modificar/${props.configId}`}
             >
               <i className="fa fa-edit"></i>
@@ -243,6 +228,7 @@ const StatisticConfigChart = (props) => {
           </div>
         </div>
       </div>
+
       {error && <div className="text-danger">{error}</div>}
       {loading == true && (
         <div className="text-center">
@@ -424,11 +410,11 @@ const StatisticConfigChart = (props) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 if (document.querySelectorAll("[data-chart-indicator]").length > 0) {
-  const docs = document.querySelectorAll("[data-chart-indicator]")
+  const docs = document.querySelectorAll("[data-chart-indicator]");
   docs.forEach((doc) => {
     ReactDOM.render(
       <StatisticConfigChart
@@ -439,6 +425,6 @@ if (document.querySelectorAll("[data-chart-indicator]").length > 0) {
         counter={doc.getAttribute("data-counter-name")}
       />,
       doc
-    )
-  })
+    );
+  });
 }

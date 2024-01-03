@@ -26,6 +26,12 @@ a:hover {
     color: #188dd9;
     text-decoration: underline;
 }
+.Select-menu-outer {
+    z-index: 100 !important;
+  }
+  .menu {
+    z-index: 100 !important;
+}
 img {
     box-sizing: border-box;
     border: 0;

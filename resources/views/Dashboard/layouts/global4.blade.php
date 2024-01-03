@@ -65,13 +65,6 @@
     <div class="wrapper">
         <div class="sidebar">
             <nav class="navbar navbar-expand-lg navbar-side navbar-dark sticky-top flex-md-nowrap p-0">
-                {{-- <a class="navbar-brand pt-3 mx-0" href="{!! route('home') !!}">
-						@if (isset($ctrl) && $ctrl == 1)
-							<h4>{!! $user->enterprise_name !!}</h4>
-						@else
-							<h4>{!! $user->enterprise_name !!}</h4>
-						@endif
-					</a> --}}
                 <a class="navbar-brand pt-3 mx-0" style="padding: 0.2em 0 !important;" href="{!! route('home') !!}">
                     <img src="{{ asset('images/submeter_logo_white_big.png') }}" alt="submeter_logo" width="200px"
                         style="margin: 0 auto" />

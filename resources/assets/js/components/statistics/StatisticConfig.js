@@ -110,6 +110,8 @@ const StatisticConfig = (props) => {
           chart_type: "",
           chart_interval_daily: "",
           chart_interval_weekly: "",
+          Order_orden: 1,
+          Size: "",
           fields: [],
         }}
         enableReinitialize
@@ -119,19 +121,15 @@ const StatisticConfig = (props) => {
           meter_id: Yup.string().required("Este campo es obligatorio"),
           color: Yup.string().required("Este campo es obligatorio"),
           chart_type: Yup.string().required("Este campo es obligatorio"),
-          chart_interval_daily: Yup.string().required(
-            "Este campo es obligatorio"
-          ),
-          chart_interval_weekly: Yup.string().required(
-            "Este campo es obligatorio"
-          ),
         })}
         onSubmit={async (values) => {
           if (values.id == 0) {
             values.type = props.type;
-            let res = await axios.post(`/api/statics/configs`, values);
+            const url = `/api/statics/configs`;
+            let res = await axios.post(url, values); //ENVIO POST
+
             if (res.status == 200) {
-              toast.success("La configuracion se ha creado correctamente");
+              toast.success("La configuración se ha creado correctamente");
               setTimeout(() => {
                 window.location.href = backUrl;
               }, 100);
@@ -140,12 +138,13 @@ const StatisticConfig = (props) => {
             }
           } else {
             values._method = "PUT";
-            let res = await axios.post(
-              `/api/statics/configs/${values.id}`,
-              values
-            );
+            values.type = props.type;
+            const url = `/api/statics/configs/${values.id}`;
+            console.log("URL para actualizar configuración:", url);
+
+            let res = await axios.post(url, values);
             if (res.status == 200) {
-              toast.success("La configuracion se ha modificado correctamente");
+              toast.success("La configuración se ha modificado correctamente");
               setTimeout(() => {
                 window.location.href = backUrl;
               }, 100);
@@ -184,14 +183,17 @@ const StatisticConfig = (props) => {
           async function fetchData(id, enterpriceId) {
             const res = await axios.get(
               props.baseUrl + `/api/statics/configs/${id}`,
-              {}
+              {
+                params: { type: props.type },
+              }
             );
             const data = res.data;
 
             setValues({
               id: data.id ? data.id : 0,
               name: data.name ? data.name : "",
-
+              Order_orden: data.Order_orden ? data.Order_orden : "",
+              Size: data.Size ? data.Size : "",
               color: data.color ? data.color : "",
               chart_type: data.chart_type ? data.chart_type : "",
               chart_interval_daily: data.chart_interval_daily
@@ -202,7 +204,6 @@ const StatisticConfig = (props) => {
                 : "",
               fields: data.fields ? data.fields : [],
             });
-
             fetchCurrentEnterprice(data.enterprise_id, data.meter_id);
           }
 
@@ -251,7 +252,10 @@ const StatisticConfig = (props) => {
                   </a>
                 </div>
                 <div className="col-sm-6">
-                  <button className="btn btn-success text-white float-right">
+                  <button
+                    type="submit"
+                    className="btn btn-success text-white float-right"
+                  >
                     <i className="fa fa-check"></i>
                     Guardar
                   </button>
@@ -328,38 +332,66 @@ const StatisticConfig = (props) => {
                     <option value="area">Area</option>
                     <option value="pie">Pie</option>
                     <option value="column">Columna</option>
+                    <option value="stackedColumn">
+                      Columnas Incrementales
+                    </option>
+                    <option value="doughnut">Sectores (dona)</option>
+                    <option value="combinada">Combinada</option>
                   </Select>
-                  <Select
-                    className="col-3"
-                    name="chart_interval_daily"
-                    value={values.chart_interval_daily}
-                    label="Intervalo diario"
-                    placeholder="Seleccione el intervalo diario(minutos)"
-                    onChange={handleChange}
-                  >
-                    <option value="15">15 minutos</option>
-                    <option value="30">30 minutos</option>
-                    <option value="45">45 minutos</option>
-                    <option value="60">1 Hora</option>
-                  </Select>
-                  <Select
-                    className="col-3"
-                    name="chart_interval_weekly"
-                    value={values.chart_interval_weekly}
-                    label="Intervalo semanal"
-                    placeholder="Seleccione el intervalo semanal(minutos)"
-                    onChange={handleChange}
-                  >
-                    <option value="15">15 minutos</option>
-                    <option value="30">30 minutos</option>
-                    <option value="45">45 minutos</option>
-                    <option value="60">1 Hora</option>
-                    <option value="120">2 Horas</option>
-                    <option value="240">4 Horas</option>
-                    <option value="360">6 Horas</option>
-                    <option value="720">12 Horas</option>
-                    <option value="1440">24 Horas</option>
-                  </Select>
+                  {props.type === "produccion" ||
+                  props.type === "indicadores" ? (
+                    <>
+                      {/* Select para Intervalo Diario */}
+                      <Select
+                        className="col-3"
+                        name="chart_interval_daily"
+                        value={values.chart_interval_daily}
+                        label="Intervalo diario"
+                        placeholder="Seleccione el intervalo diario"
+                        onChange={handleChange}
+                      >
+                        <option value="15">15 minutos</option>
+                        <option value="30">30 minutos</option>
+                        <option value="45">45 minutos</option>
+                        <option value="60">1 Hora</option>
+                      </Select>
+
+                      {/* Select para Intervalo Semanal */}
+                      <Select
+                        className="col-3"
+                        name="chart_interval_weekly"
+                        value={values.chart_interval_weekly}
+                        label="Intervalo semanal"
+                        placeholder="Seleccione el intervalo semanal"
+                        onChange={handleChange}
+                      >
+                        <option value="15">15 minutos</option>
+                        <option value="30">30 minutos</option>
+                        <option value="45">45 minutos</option>
+                        <option value="60">1 Hora</option>
+                        <option value="120">2 Horas</option>
+                        <option value="240">4 Horas</option>
+                        <option value="360">6 Horas</option>
+                        <option value="720">12 Horas</option>
+                        <option value="1440">24 Horas</option>
+                      </Select>
+                    </>
+                  ) : props.type === "representacion" ? (
+                    <>
+                      {/* Select para Tamaño */}
+                      <Select
+                        className="col-3"
+                        name="Size"
+                        value={values.Size}
+                        label="Tamaño de la gráfica"
+                        placeholder="Seleccione el tamaño"
+                        onChange={handleChange}
+                      >
+                        <option value="100">100%</option>
+                        <option value="50">50%</option>
+                      </Select>
+                    </>
+                  ) : null}
                 </Form.Row>
                 <Form.Row>
                   <div className="col-6">
@@ -416,28 +448,6 @@ const StatisticConfig = (props) => {
                             title: "Tipo",
                             data: "field_type_name",
                           },
-
-                          // {
-                          //     title: "Tipo",
-                          //     data:null,
-                          //     createdCell: (td, cellData, rowData) => {
-                          //         let txt = ''//props.productTypeName(rowData.field_type);
-
-                          //         console.log(productionTypes)
-                          //         console.log(props.productionTypes)
-                          //         /*if(props.productionTypes)
-                          //         {
-                          //             const c = props.productionTypes.find(f=>f.id == rowData.field_type)
-                          //             if(c) txt = c.name
-                          //         }
-                          //         */
-
-                          //         return ReactDOM.render(
-                          //             <div>{txt}</div>
-                          //             ,td
-                          //         )
-                          //     }
-                          // },
                           {
                             title: "Operacion",
                             data: null,
@@ -528,8 +538,10 @@ const StatisticConfig = (props) => {
                 databaseMeta={databaseMeta ? databaseMeta : []}
                 show={currentField.show}
                 data={currentField.data}
+                currentChart={values.chart_type}
                 onHide={() => setCurrentField({ show: false })}
                 onSave={onSaveField}
+                type={props.type}
               />
             </Form>
           );
@@ -555,7 +567,6 @@ const StatisticConfig = (props) => {
 
 if (document.getElementById("statistic-config-frm")) {
   var doc = document.getElementById("statistic-config-frm");
-
   ReactDOM.render(
     <StatisticConfig
       configId={doc.getAttribute("data-id")}
